@@ -6,9 +6,9 @@ import { Text, View } from "react-native";
 export default function Index() {
   return (
     <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-3xl">Aura!</Text>
+        <Text className="text-3xl font-pblack">Aura!</Text>
         <StatusBar style="auto" />
-        <Link href="/profile" style={{ color: 'blue'}}>Go to profile</Link>
+        <Link href="/home" style={{ color: 'blue'}}>Go to Home</Link>
     </View>
   );
 }
