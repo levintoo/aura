@@ -48,7 +48,7 @@ export default function Index() {
           <PrimaryButton
             title="Continue with Email"
             handlePress={() => {
-              router.push("/register");
+              router.push("/login");
             }}
             containerStyles="w-full mt-7"
           />
