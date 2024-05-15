@@ -1,11 +1,12 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Link, router } from "expo-router";
 
 import { images } from "../../constants";
 import FormField from "../../components/FormField";
 import PrimaryButton from "../../components/PrimaryButton";
-import { Link } from "expo-router";
+import { signIn } from "../../lib/appwrite";
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -14,7 +15,24 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const submit = () => {};
+  const submit = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert("Error: Please fill in all required fields");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await signIn(form.email, form.password, form.username);
+      // set result to global state
+      router.replace("/home");
+    } catch (error) {
+      Alert.alert(`Error: Something went wrong ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -51,7 +69,7 @@ const Login = () => {
           />
 
           <PrimaryButton
-            title="Sign Up"
+            title="Sign In"
             handlePress={submit}
             containerStyles="mt-7"
           />

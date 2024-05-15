@@ -1,11 +1,12 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "../../constants";
 import FormField from "../../components/FormField";
 import PrimaryButton from "../../components/PrimaryButton";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { createUser } from "../../lib/appwrite";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -15,7 +16,24 @@ const Register = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const submit = () => {};
+  const submit = async () => {
+    if(!form.email || !form.password || !form.username) {
+      Alert.alert('Error: Please fill in all required fields')
+      return
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await createUser(form.email, form.password, form.username);
+      // set result to global state
+      router.replace('/home')
+    } catch (error) {
+      Alert.alert(`Error: Something went wrong ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
