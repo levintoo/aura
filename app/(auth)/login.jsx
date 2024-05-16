@@ -6,9 +6,11 @@ import { Link, router } from "expo-router";
 import { images } from "../../constants";
 import FormField from "../../components/FormField";
 import PrimaryButton from "../../components/PrimaryButton";
-import { signIn } from "../../lib/appwrite";
+import { getCurrentUser, signIn } from "../../lib/appwrite";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const Login = () => {
+  const { setUser, setIsLoggedIn } = useGlobalContext()
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -24,8 +26,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const result = await signIn(form.email, form.password, form.username);
-      // set result to global state
+      await signIn(form.email, form.password);
+      const result = await getCurrentUser()
+
+      setUser(result);
+      setIsLoggedIn(true);
+
       router.replace("/home");
     } catch (error) {
       Alert.alert(`Error: Something went wrong ${error.message}`);
