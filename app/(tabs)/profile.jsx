@@ -1,5 +1,6 @@
 import { View, FlatList, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 
 import EmptyState from "../../components/EmptyState";
 import { getUserPosts, signOut } from "../../lib/appwrite";
@@ -8,7 +9,6 @@ import VideoCard from "../../components/VideoCard";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons } from "../../constants";
 import InfoBox from "../../components/InfoBox";
-import { router } from "expo-router";
 
 const profile = () => {
   const { user, setUser, setIsLoggedIn } = useGlobalContext();
