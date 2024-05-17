@@ -10,13 +10,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import { ResizeMode, Video } from "expo-av";
 import * as DocumentPicker from "expo-document-picker";
+import { router } from "expo-router";
 
 import FormField from "../../components/FormField";
 import PrimaryButton from "../../components/PrimaryButton";
-
+import { createVideo } from "../../lib/appwrite";
+import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons } from "../../constants";
 
 const create = () => {
+  const { user } = useGlobalContext();
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -41,15 +44,27 @@ const create = () => {
       if (selectType === "video") {
         setForm({ ...form, video: result.assets[0] });
       }
-    } else {
-      setTimeout(() => {
-        Alert.alert("Document picked", JSON.stringify(result, null, 2));
-      }, 100);
     }
   };
 
-  const submit = () => {
-    // TODO: implement logic
+  const submit = async () => {
+    if (!form.prompt || !form.title || !form.thumbnail || !form.video) {
+      Alert.alert("Error: Please fill in all required fields");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      await createVideo({ ...form, userId: user.$id });
+      Alert.alert("Success", "Post uploaded succesfully");
+      router.push("/home");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setForm({ title: "", video: null, thumbnail: null, prompt: "" });
+      setUploading(false);
+    }
   };
 
   return (
@@ -61,7 +76,7 @@ const create = () => {
           title="Video Title"
           value={form.title}
           placeholder="Give your video a catchy title"
-          handleChangeTest={(e) => setForm({ ...form, title: e })}
+          handleChange={(e) => setForm({ ...form, title: e })}
           otherStyles="mt-10"
         />
 
@@ -79,9 +94,7 @@ const create = () => {
               <Video
                 source={{ uri: form.video.uri }}
                 className="w-full h-64 rounded-2xl"
-                useNativeControls
                 resizeMode={ResizeMode.COVER}
-                isLooping
               />
             ) : (
               <View className="w-full h-40 px-4 bg-black-100 rounded-2xl justify-center items-center">
@@ -133,7 +146,7 @@ const create = () => {
           title="AI Prompt"
           value={form.prompt}
           placeholder="The prompt you used to generate this video"
-          handleChangeTest={(e) => setForm({ ...form, prompt: e })}
+          handleChange={(e) => setForm({ ...form, prompt: e })}
           otherStyles="mt-7"
         />
 
